@@ -1,0 +1,3 @@
+#pragma once
+
+#define CLOADER_VERSION "@CLOADER_VERSION@"
