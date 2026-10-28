@@ -62,7 +62,7 @@ void* LoadLibrary(const char* filepath)
     return handle;
 }
 
-void UnloadLibrary(void* handle)
+void UnloadLibrary(void* handle) noexcept
 {
     if (handle)
     {
@@ -80,6 +80,15 @@ void UnloadLibrary(void* handle)
 
 void* LoadSymbolFromLibrary(void* handle, const char* symbolName)
 {
+    if (!handle)
+    {
+        throw cloader::InvalidArgumentException("Library handle cannot be null");
+    }
+    if (!symbolName || !*symbolName)
+    {
+        throw cloader::InvalidArgumentException("Symbol name cannot be null or empty");
+    }
+
     logging::LogDebug(std::format("Resolving symbol '{}'", symbolName));
     void* symbol = dlsym(handle, symbolName);
     if (!symbol)

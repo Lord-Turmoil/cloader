@@ -43,7 +43,7 @@ void usage()
 int main(int argc, char* argv[])
 {
     std::unique_ptr<cloader::ClassLoader<extension::Spi>> loader;
-    cloader::ClassLoader<extension::Spi>::InstancePtr spi;
+    cloader::LoadablePtr<extension::Spi> spi;
     const char* args;
 
     if (argc >= 3)
