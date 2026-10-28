@@ -1,7 +1,5 @@
 #pragma once
 
-#include "cloader/details/Logging.h"
-
 #include <format>
 
 namespace cloader
@@ -60,18 +58,9 @@ public:
                     {
                         deleter(loadable);
                     }
-                    catch (const std::exception& e)
-                    {
-                        // supress any exception
-                        details::logging::LogError(
-                            std::format("Exception occurred while deleting instance of class '{}': {}",
-                                        typeid(T).name(), e.what()));
-                    }
                     catch (...)
                     {
                         // supress any exception
-                        details::logging::LogError(std::format(
-                            "Unknown exception occurred while deleting instance of class '{}'", typeid(T).name()));
                     }
                 }
                 else
@@ -84,3 +73,40 @@ public:
 };
 
 } // namespace cloader
+
+#define _CLOADER_SELECT_SYMBOL_NAME_MACRO(_1, _2, _3, _4, _5, NAME, ...) NAME
+
+// clang-format off
+#define _CLOADER_GET_SYMBOL_NAME_0(PREFIX)                                                                             \
+    PREFIX
+#define _CLOADER_GET_SYMBOL_NAME_1(PREFIX, CLASS_NAME)                                                                 \
+    PREFIX##_##CLASS_NAME
+#define _CLOADER_GET_SYMBOL_NAME_2(PREFIX, N1, CLASS_NAME)                                                             \
+    PREFIX##_##N1##__##CLASS_NAME
+#define _CLOADER_GET_SYMBOL_NAME_3(PREFIX, N1, N2, CLASS_NAME)                                                         \
+    PREFIX##_##N1##_##N2##__##CLASS_NAME
+#define _CLOADER_GET_SYMBOL_NAME_4(PREFIX, N1, N2, N3, CLASS_NAME)                                                     \
+    PREFIX##_##N1##_##N2##_##N3##__##CLASS_NAME
+#define _CLOADER_GET_SYMBOL_NAME_5(PREFIX, N1, N2, N3, N4, CLASS_NAME)                                                 \
+    PREFIX##_##N1##_##N2##_##N3##_##N4##__##CLASS_NAME
+
+#define _CLOADER_GET_SYMBOL_NAME(PREFIX, ...)                                                                          \
+    _CLOADER_SELECT_SYMBOL_NAME_MACRO(                                                                                 \
+        __VA_ARGS__,                                                                                                   \
+        _CLOADER_GET_SYMBOL_NAME_5,                                                                                    \
+        _CLOADER_GET_SYMBOL_NAME_4,                                                                                    \
+        _CLOADER_GET_SYMBOL_NAME_3,                                                                                    \
+        _CLOADER_GET_SYMBOL_NAME_2,                                                                                    \
+        _CLOADER_GET_SYMBOL_NAME_1,                                                                                    \
+        _CLOADER_GET_SYMBOL_NAME_0                                                                                     \
+    )(PREFIX, __VA_ARGS__)
+// clang-format on
+
+#define _CLOADER_NEW_INSTANCE_SYMBOL_NAME(...)    _CLOADER_GET_SYMBOL_NAME(Cloader_NewLoadableInstance, __VA_ARGS__)
+#define _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(...) _CLOADER_GET_SYMBOL_NAME(Cloader_DeleteLoadableInstance, __VA_ARGS__)
+
+#define DECLARE_CLOADER_NEW_INSTANCE(...)                                                                              \
+    extern "C" cloader::Loadable* _CLOADER_NEW_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(void* args)
+
+#define DECLARE_CLOADER_DELETE_INSTANCE(...)                                                                           \
+    extern "C" void _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(cloader::Loadable * instance)

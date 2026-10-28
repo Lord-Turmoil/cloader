@@ -2,13 +2,13 @@
 
 #include <cloader/cloader.h>
 
-namespace extension
+namespace ext
 {
 
-class Spi : public cloader::Loadable
+class ILogger : public cloader::Loadable
 {
 public:
-    virtual ~Spi() = 0;
+    virtual ~ILogger() = 0;
 
 public:
     virtual void OnAppStart()
@@ -24,12 +24,14 @@ public:
     }
 };
 
-Spi::~Spi() = default;
+ILogger::~ILogger() = default;
 
-#define SPI_LOG()                                                                                                      \
+} // namespace ext
+
+#define LOG_FUNC()                                                                                                     \
     do                                                                                                                 \
     {                                                                                                                  \
         std::cout << __func__ << "()" << std::endl;                                                                    \
     } while (0)
 
-} // namespace extension
+#define CLS_NAME() typeid(*this).
