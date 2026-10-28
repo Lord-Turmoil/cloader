@@ -3,7 +3,8 @@
 #include "cloader/Exception.h"
 #include "cloader/details/Config.h"
 #include "cloader/details/Logging.h"
-#include "cloader/details/NativeLoader.h"
+
+#include "details/NativeLoader.h"
 
 #include <format>
 #include <iostream>

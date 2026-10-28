@@ -7,5 +7,3 @@ cmake -S . -B build                 \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 cmake --build build --parallel
-
-cmake --install build --prefix build/install

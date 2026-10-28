@@ -26,6 +26,8 @@ target_include_directories(
         "$<BUILD_INTERFACE:${cloader_source_dir}/include>"
         "$<BUILD_INTERFACE:${cloader_generated_include_dir}>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+    PRIVATE
+        "$<BUILD_INTERFACE:${cloader_source_dir}/src>"
 )
 
 set_target_properties(

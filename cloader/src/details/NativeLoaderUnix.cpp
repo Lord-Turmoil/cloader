@@ -2,7 +2,7 @@
 
 #ifdef CLOADER_PLATFORM_UNIX
 
-#include "cloader/details/NativeLoader.h"
+#include "details/NativeLoader.h"
 
 #include "cloader/ClassLoader.h"
 #include "cloader/Exception.h"
