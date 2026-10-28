@@ -20,7 +20,22 @@ namespace
 
 std::unordered_map<void*, std::string> sHandleToFilepath;
 
+void SetFilepathForHandle(void* handle, const std::string& filepath)
+{
+    sHandleToFilepath[handle] = filepath;
 }
+
+const std::string& GetFilepathForHandle(void* handle)
+{
+    auto it = sHandleToFilepath.find(handle);
+    if (it == sHandleToFilepath.end())
+    {
+        throw cloader::InvalidArgumentException("Invalid library handle");
+    }
+    return it->second;
+}
+
+} // namespace
 
 namespace cloader::details
 {
@@ -40,9 +55,9 @@ void* LoadLibrary(const char* filepath)
         logging::LogError(std::format("Failed to load library '{}': {}", filepath, dlerror()));
         throw cloader::FileNotFoundException(filepath);
     }
+    SetFilepathForHandle(handle, filepath);
 
     logging::LogDebug(std::format("Library loaded: '{}'", filepath));
-    sHandleToFilepath[handle] = filepath;
 
     return handle;
 }
@@ -51,38 +66,28 @@ void UnloadLibrary(void* handle)
 {
     if (handle)
     {
-        auto it = sHandleToFilepath.find(handle);
-        if (it != sHandleToFilepath.end())
+        std::string filepath = GetFilepathForHandle(handle);
+        if (dlclose(handle) != 0)
         {
-            if (dlclose(handle) != 0)
-            {
-                logging::LogError(std::format("Failed to unload library '{}': {}", it->second, dlerror()));
-            }
-            else
-            {
-                logging::LogDebug(std::format("Library unloaded: '{}'", it->second));
-            }
+            logging::LogError(std::format("Failed to unload library '{}': {}", filepath, dlerror()));
         }
         else
         {
-            throw cloader::InvalidArgumentException("Invalid library handle");
+            logging::LogDebug(std::format("Library unloaded: '{}'", filepath));
         }
     }
 }
 
-void* LoadSymbolFromLibrary(void* handle, const char* className)
+void* LoadSymbolFromLibrary(void* handle, const char* symbolName)
 {
-    std::string symbolName = ResolveSymbolName(className);
-
-    logging::LogDebug(std::format("Resolving symbol '{}' for class '{}'", symbolName, className));
-    void* symbol = dlsym(handle, symbolName.c_str());
+    logging::LogDebug(std::format("Resolving symbol '{}'", symbolName));
+    void* symbol = dlsym(handle, symbolName);
     if (!symbol)
     {
-        logging::LogError(
-            std::format("Failed to resolve symbol '{}' for class '{}': {}", symbolName, className, dlerror()));
-        throw cloader::ClassNotFoundException(className, symbolName.c_str());
+        std::string filepath = GetFilepathForHandle(handle);
+        logging::LogWarning(
+            std::format("Failed to resolve symbol '{}' in library '{}': {}", symbolName, filepath, dlerror()));
     }
-
     return symbol;
 }
 

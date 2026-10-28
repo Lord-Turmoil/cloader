@@ -16,10 +16,12 @@ namespace cloader
 class ClassLoaderBase
 {
 public:
-    using FactoryFn = cloader::Loadable* (*)(void* args);
+    using NewInstanceFn = cloader::Loadable* (*)(void*);
+    using DeleteInstanceFn = void (*)(cloader::Loadable*);
 
     ClassLoaderBase(const char* filepath, const char* className);
-    ClassLoaderBase(FactoryFn factory);
+    ClassLoaderBase(NewInstanceFn newInstanceFn, DeleteInstanceFn deleteInstanceFn);
+    ClassLoaderBase(NewInstanceFn newInstanceFn);
 
     ClassLoaderBase(const ClassLoaderBase&) = delete;
     ClassLoaderBase& operator=(const ClassLoaderBase&) = delete;
@@ -28,47 +30,50 @@ public:
 
     ~ClassLoaderBase();
 
-protected:
-    Loadable* _NewInstance(void* args);
-
 private:
     void* _handle;
-    FactoryFn _factory;
+
+protected:
+    NewInstanceFn _newInstanceFn;
+    DeleteInstanceFn _deleteInstanceFn;
 };
 
-template <typename T> class ClassLoader : public ClassLoaderBase
+template <typename T, typename D = Loadable::Deleter<T>> class ClassLoader : public ClassLoaderBase
 {
 public:
-    ClassLoader(const char* filepath, const char* className);
-    ClassLoader(FactoryFn factory);
+    using InstancePtr = std::unique_ptr<T, D>;
 
-    std::unique_ptr<T> NewInstance(void* args);
+    ClassLoader(const char* filepath, const char* className);
+    ClassLoader(NewInstanceFn factory);
+
+    InstancePtr NewInstance(void* args);
 };
 
-template <typename T>
-ClassLoader<T>::ClassLoader(const char* filepath, const char* className) : ClassLoaderBase(filepath, className)
+template <typename T, typename D>
+ClassLoader<T, D>::ClassLoader(const char* filepath, const char* className) : ClassLoaderBase(filepath, className)
 {
     details::logging::LogInfo(std::format("Loaded class '{}' in '{}'", className, filepath));
 }
 
-template <typename T> ClassLoader<T>::ClassLoader(FactoryFn factory) : ClassLoaderBase(factory)
+template <typename T, typename D> ClassLoader<T, D>::ClassLoader(NewInstanceFn factory) : ClassLoaderBase(factory)
 {
     details::logging::LogInfo(std::format("Loaded internal class '{}'", typeid(T).name()));
 }
 
-template <typename T> std::unique_ptr<T> ClassLoader<T>::NewInstance(void* args)
+template <typename T, typename D> typename ClassLoader<T, D>::InstancePtr ClassLoader<T, D>::NewInstance(void* args)
 {
     Loadable* loadable;
 
     try
     {
-        loadable = _NewInstance(args);
+        details::logging::LogInfo(std::format("Instantiating class '{}'", typeid(T).name()));
+        loadable = _newInstanceFn(args);
     }
-    catch (InstantiationException& e)
+    catch (const InstantiationException& e)
     {
         throw InstantiationException(typeid(T), e);
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         throw InstantiationException(typeid(T), e);
     }
@@ -86,10 +91,10 @@ template <typename T> std::unique_ptr<T> ClassLoader<T>::NewInstance(void* args)
     if (!instance)
     {
         delete loadable;
-        throw ClassCastException(typeid(*loadable), typeid(T));
+        throw ClassCastException(typeid(Loadable), typeid(T));
     }
 
-    return std::unique_ptr<T>(instance);
+    return InstancePtr(instance, D{ _deleteInstanceFn });
 }
 
 } // namespace cloader

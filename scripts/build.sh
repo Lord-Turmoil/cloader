@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_TYPE=${1:-Release}
+BUILD_TYPE=${1:-Debug}
 
 cmake -S . -B build                 \
     -DCLOADER_BUILD_EXAMPLES=ON     \

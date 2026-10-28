@@ -28,17 +28,17 @@ std::string FormatInstantiationMessage(const std::type_info& type)
 
 std::string FormatInstantiationMessageWithCause(const std::type_info& type, const char* cause)
 {
-    return FormatInstantiationMessage(type) + "': " + std::string(cause);
+    return FormatInstantiationMessage(type) + ": " + std::string(cause);
 }
 
 std::string FormatInstantiationMessageWithCause(const std::type_info& type, const CloaderException& cause)
 {
-    return FormatInstantiationMessage(type) + "': " + cause.GetMessage();
+    return FormatInstantiationMessage(type) + ": " + cause.GetMessage();
 }
 
 std::string FormatInstantiationMessageWithCause(const std::type_info& type, const std::exception& cause)
 {
-    return FormatInstantiationMessage(type) + "': " + std::string(cause.what());
+    return FormatInstantiationMessage(type) + ": " + std::string(cause.what());
 }
 
 } // namespace
@@ -74,7 +74,7 @@ FileNotFoundException::FileNotFoundException(const char* filepath)
 {
 }
 
-ClassNotFoundException::ClassNotFoundException(const char* className, const char* symbolName)
+SymbolNotFoundException::SymbolNotFoundException(const char* className, const char* symbolName)
     : CloaderException(FormatClassNotFoundMessage(className, symbolName))
 {
 }

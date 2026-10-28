@@ -40,12 +40,12 @@ public:
     ~FileNotFoundException() override = default;
 };
 
-class ClassNotFoundException : public CloaderException
+class SymbolNotFoundException : public CloaderException
 {
 public:
-    ClassNotFoundException(const char* className, const char* symbolName);
+    SymbolNotFoundException(const char* className, const char* symbolName);
 
-    ~ClassNotFoundException() override = default;
+    ~SymbolNotFoundException() override = default;
 };
 
 class ClassCastException : public CloaderException

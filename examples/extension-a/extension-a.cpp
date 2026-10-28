@@ -45,6 +45,23 @@ public:
 
 extern "C" cloader::Loadable* Cloader_NewLoadableInstance_exta__ASpi(void* args)
 {
-    const char* msg = args ? static_cast<const char*>(args) : "Hello from ASpi!";
-    return new exta::ASpi(std::string(msg));
+    std::string msg = args ? static_cast<const char*>(args) : "Hello from ASpi!";
+
+    if (msg == "throw")
+    {
+        throw std::runtime_error("ASpi: throw");
+    }
+    else if (msg == "null")
+    {
+        return nullptr;
+    }
+
+    return new exta::ASpi(msg);
+}
+
+extern "C" void Cloader_DeleteLoadableInstance_exta__ASpi(cloader::Loadable* instance)
+{
+    std::cout << "Custom delete function called for ASpi instance." << std::endl;
+
+    delete instance;
 }

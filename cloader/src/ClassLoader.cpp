@@ -1,6 +1,7 @@
 #include "cloader/ClassLoader.h"
 
 #include "cloader/Exception.h"
+#include "cloader/details/Config.h"
 #include "cloader/details/Logging.h"
 #include "cloader/details/NativeLoader.h"
 
@@ -51,14 +52,48 @@ namespace cloader
 ClassLoaderBase::ClassLoaderBase(const char* filepath, const char* className)
 {
     HandleGuard handle(details::LoadLibrary(filepath));
-    void* symbol = details::LoadSymbolFromLibrary(handle.Get(), className);
+
+    std::string newInstanceSymbolName = details::ResolveSymbolName(CLOADER_NEW_SYMBOL_PREFIX, className);
+    std::string deleteInstanceSymbolName = details::ResolveSymbolName(CLOADER_DELETE_SYMBOL_PREFIX, className);
+
+    void* newInstanceSymbol = details::LoadSymbolFromLibrary(handle.Get(), newInstanceSymbolName.c_str());
+    if (!newInstanceSymbol)
+    {
+        throw SymbolNotFoundException(className, newInstanceSymbolName.c_str());
+    }
+    _newInstanceFn = reinterpret_cast<NewInstanceFn>(newInstanceSymbol);
+
+    void* deleteInstanceSymbol = details::LoadSymbolFromLibrary(handle.Get(), deleteInstanceSymbolName.c_str());
+    if (deleteInstanceSymbol)
+    {
+        _deleteInstanceFn = reinterpret_cast<DeleteInstanceFn>(deleteInstanceSymbol);
+    }
+    else
+    {
+        details::logging::LogWarning(std::format("Symbol '{}' not found for class '{}'. Using default delete function.",
+                                                 deleteInstanceSymbolName, className));
+        _deleteInstanceFn = nullptr;
+    }
 
     _handle = handle.Release();
-    _factory = reinterpret_cast<cloader::Loadable* (*)(void*)>(symbol);
 }
 
-ClassLoaderBase::ClassLoaderBase(FactoryFn factory) : _handle(nullptr), _factory(factory)
+ClassLoaderBase::ClassLoaderBase(NewInstanceFn newInstanceFn, DeleteInstanceFn deleteInstanceFn)
+    : _handle(nullptr), _newInstanceFn(newInstanceFn), _deleteInstanceFn(deleteInstanceFn)
 {
+    if (!_newInstanceFn)
+    {
+        throw InvalidArgumentException("New instance function cannot be null");
+    }
+}
+
+ClassLoaderBase::ClassLoaderBase(NewInstanceFn newInstanceFn)
+    : _handle(nullptr), _newInstanceFn(newInstanceFn), _deleteInstanceFn(nullptr)
+{
+    if (!_newInstanceFn)
+    {
+        throw InvalidArgumentException("New instance function cannot be null");
+    }
 }
 
 ClassLoaderBase::~ClassLoaderBase()
@@ -67,17 +102,9 @@ ClassLoaderBase::~ClassLoaderBase()
     {
         details::UnloadLibrary(_handle);
         _handle = nullptr;
-        _factory = nullptr;
+        _newInstanceFn = nullptr;
+        _deleteInstanceFn = nullptr;
     }
-}
-
-Loadable* ClassLoaderBase::_NewInstance(void* args)
-{
-    if (!_factory)
-    {
-        throw InstantiationException("Library not loaded");
-    }
-    return _factory(args);
 }
 
 } // namespace cloader

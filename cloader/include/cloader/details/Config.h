@@ -8,5 +8,6 @@
 #error "Unsupported platform"
 #endif
 
-#define CLOADER_SYMBOL_PREFIX     "Cloader_NewLoadableInstance"
-#define CLOADER_LOG_LEVEL_ENV_VAR "CLOADER_LOG"
+#define CLOADER_NEW_SYMBOL_PREFIX    "Cloader_NewLoadableInstance"
+#define CLOADER_DELETE_SYMBOL_PREFIX "Cloader_DeleteLoadableInstance"
+#define CLOADER_LOG_LEVEL_ENV_VAR    "CLOADER_LOG"

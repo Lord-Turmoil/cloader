@@ -100,8 +100,11 @@ void LogError(const std::string& message)
 
 void Log(LogLevel level, const std::string& message)
 {
-    const char* tag = ToString(level);
-    std::cerr << "(cloader) [" << tag << "] " << message << std::endl;
+    if (level >= CurrentLogLevel())
+    {
+        const char* tag = ToString(level);
+        std::cerr << "(cloader) [" << tag << "] " << message << std::endl;
+    }
 }
 
 } // namespace logging

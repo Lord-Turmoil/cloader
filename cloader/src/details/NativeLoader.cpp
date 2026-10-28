@@ -7,9 +7,8 @@ namespace
 
 std::string ResolveMangledSymbolName(const char* className)
 {
-    std::string symbolName = CLOADER_SYMBOL_PREFIX;
+    std::string symbolName;
 
-    symbolName.push_back('_');
     for (const char* p = className; *p; ++p)
     {
         if (*p == ':')
@@ -21,6 +20,7 @@ std::string ResolveMangledSymbolName(const char* className)
             symbolName.push_back(*p);
         }
     }
+
     return symbolName;
 }
 
@@ -29,14 +29,17 @@ std::string ResolveMangledSymbolName(const char* className)
 namespace cloader::details
 {
 
-std::string ResolveSymbolName(const char* className)
+std::string ResolveSymbolName(const char* prefix, const char* className)
 {
+    std::string symbolName = prefix;
+
     if (className && *className)
     {
-        return ResolveMangledSymbolName(className);
+        symbolName += "_";
+        symbolName += ResolveMangledSymbolName(className);
     }
 
-    return { CLOADER_SYMBOL_PREFIX };
+    return symbolName;
 }
 
 } // namespace cloader::details
