@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace extb
+namespace libb
 {
 
 class BSpi : public extension::Spi
@@ -11,12 +11,12 @@ class BSpi : public extension::Spi
 public:
     BSpi(std::string message) : _message(std::move(message))
     {
-        std::cout << "BSpi(" << _message << ")" << std::endl;
+        SPI_LOG();
     }
 
     ~BSpi() override
     {
-        std::cout << "~BSpi()" << std::endl;
+        SPI_LOG();
     }
 
 private:
@@ -40,34 +40,37 @@ public:
     }
 };
 
-} // namespace extb
+} // namespace libb
 
-extern "C" cloader::Loadable* Cloader_NewLoadableInstance_extb__BSpi(void* args)
+extern "C" cloader::Loadable* Cloader_NewLoadableInstance_libb__BSpi(void* args)
 {
+    SPI_LOG();
     std::string msg = args ? static_cast<const char*>(args) : "Err... This is BSpi.";
-
-    if (msg == "throw")
-    {
-        throw std::runtime_error("BSpi: throw");
-    }
-    else if (msg == "null")
-    {
-        return nullptr;
-    }
-
-    return new extb::BSpi(msg);
+    return new libb::BSpi(msg);
 }
 
 class BadSpi : public cloader::Loadable
 {
 public:
+    BadSpi()
+    {
+        SPI_LOG();
+    }
+
     ~BadSpi() override
     {
-        std::cout << "~BadSpi()" << std::endl;
+        SPI_LOG();
     }
 };
 
 extern "C" cloader::Loadable* Cloader_NewLoadableInstance_BadSpi(void*)
 {
+    SPI_LOG();
     return new BadSpi();
+}
+
+extern "C" void Cloader_DeleteLoadableInstance_BadSpi(cloader::Loadable* instance)
+{
+    SPI_LOG();
+    delete instance;
 }

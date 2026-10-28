@@ -26,4 +26,10 @@ public:
 
 Spi::~Spi() = default;
 
+#define SPI_LOG()                                                                                                      \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        std::cout << __func__ << "()" << std::endl;                                                                    \
+    } while (0)
+
 } // namespace extension

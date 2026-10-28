@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace exta
+namespace liba
 {
 
 class ASpi : public extension::Spi
@@ -11,12 +11,12 @@ class ASpi : public extension::Spi
 public:
     ASpi(std::string message) : _message(std::move(message))
     {
-        std::cout << "Aspi(" << _message << ")" << std::endl;
+        SPI_LOG();
     }
 
     ~ASpi() override
     {
-        std::cout << "~ASpi()" << std::endl;
+        SPI_LOG();
     }
 
     static Loadable* NewInstance(void* args);
@@ -41,27 +41,29 @@ public:
     }
 };
 
-} // namespace exta
+} // namespace liba
 
-extern "C" cloader::Loadable* Cloader_NewLoadableInstance_exta__ASpi(void* args)
+extern "C" cloader::Loadable* Cloader_NewLoadableInstance_liba__ASpi(void* args)
 {
+    SPI_LOG();
+
     std::string msg = args ? static_cast<const char*>(args) : "Hello from ASpi!";
 
     if (msg == "throw")
     {
-        throw std::runtime_error("ASpi: throw");
+        throw std::runtime_error("ASpi is naughty");
     }
     else if (msg == "null")
     {
         return nullptr;
     }
 
-    return new exta::ASpi(msg);
+    return new liba::ASpi(msg);
 }
 
-extern "C" void Cloader_DeleteLoadableInstance_exta__ASpi(cloader::Loadable* instance)
+extern "C" void Cloader_DeleteLoadableInstance_liba__ASpi(cloader::Loadable* instance)
 {
-    std::cout << "Custom delete function called for ASpi instance." << std::endl;
+    SPI_LOG();
 
     delete instance;
 }

@@ -1,3 +1,3 @@
 add_subdirectory(app)
-add_subdirectory(extension-a)
-add_subdirectory(extension-b)
+add_subdirectory(liba)
+add_subdirectory(libb)
