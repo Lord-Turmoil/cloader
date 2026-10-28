@@ -1,19 +1,9 @@
 #!/bin/bash
 
-BUILD_ROOT="$(pwd)/build/examples"
+BUILD_ROOT="$(pwd)/build"
 
-APP_BIN="$BUILD_ROOT/app/cloader-example"
-
-EXTENSION_DIR=(
-    "$BUILD_ROOT/extension-a"
-    "$BUILD_ROOT/extension-b"
-)
-EXTRA_LIBRARY_PATH=""
-for dir in "${EXTENSION_DIR[@]}"; do
-    if [ -d "$dir" ]; then
-        EXTRA_LIBRARY_PATH="$dir${EXTRA_LIBRARY_PATH:+:$EXTRA_LIBRARY_PATH}"
-    fi
-done
+APP_BIN="$BUILD_ROOT/bin/cloader-example"
+EXTRA_LIBRARY_PATH="$BUILD_ROOT/lib"
 
 case "$(uname -s)" in
     Darwin)
