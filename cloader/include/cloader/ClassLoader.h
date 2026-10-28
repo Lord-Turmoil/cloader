@@ -90,11 +90,11 @@ template <typename T, typename D> typename ClassLoader<T, D>::InstancePtr ClassL
     T* instance = dynamic_cast<T*>(loadable);
     if (!instance)
     {
-        delete loadable;
+        Loadable::Deleter<Loadable>{ _deleteInstanceFn }(loadable);
         throw ClassCastException(typeid(Loadable), typeid(T));
     }
 
-    return InstancePtr(instance, D{ _deleteInstanceFn });
+    return InstancePtr(instance, { _deleteInstanceFn });
 }
 
 } // namespace cloader
