@@ -45,7 +45,7 @@ write_basic_package_version_file(
 )
 
 install(
-    FILES cloader-targets.cmake
+    EXPORT cloader-targets
     NAMESPACE cloader::
     DESTINATION "${cloader_config_install_dir}"
 )

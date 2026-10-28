@@ -36,13 +36,17 @@ set_target_properties(
         SOVERSION "${PROJECT_VERSION_MAJOR}"
 )
 
-install(FILES ${cloader_headers}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/cloader"
+install(
+    DIRECTORY "${cloader_source_dir}/include/cloader"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    FILES_MATCHING
+        PATTERN "*.h"
 )
 install(FILES "${cloader_generated_include_dir}/cloader/version.h"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/cloader"
 )
 install(TARGETS cloader
+    EXPORT cloader-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
