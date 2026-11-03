@@ -17,3 +17,4 @@ macro(configure_library target_name)
 endmacro()
 
 configure_library(StandardLogger)
+configure_library(VerboseLogger)

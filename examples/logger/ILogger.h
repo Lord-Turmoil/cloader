@@ -34,4 +34,4 @@ ILogger::~ILogger() = default;
         std::cout << __func__ << "()" << std::endl;                                                                    \
     } while (0)
 
-#define CLS_NAME() typeid(*this).
+#define CLS_NAME() typeid(*this).name()
