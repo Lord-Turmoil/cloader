@@ -2,7 +2,7 @@ set(cloader_source_dir "${CMAKE_CURRENT_SOURCE_DIR}")
 set(cloader_generated_include_dir "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/cloader/version.h.in"
+    "${cloader_source_dir}/include/cloader/version.h.in"
     "${cloader_generated_include_dir}/cloader/version.h"
     @ONLY
 )
@@ -15,7 +15,12 @@ file(GLOB_RECURSE cloader_sources CONFIGURE_DEPENDS
     "${cloader_source_dir}/src/*.cpp"
 )
 
-add_library(cloader ${cloader_sources} ${cloader_headers})
+add_library(
+    cloader
+    ${cloader_headers}
+    ${cloader_sources}
+    "${cloader_generated_include_dir}/cloader/version.h"
+)
 add_library(cloader::cloader ALIAS cloader)
 
 cloader_configure_compiler(cloader)
@@ -44,12 +49,14 @@ install(
     FILES_MATCHING
         PATTERN "*.h"
 )
-install(FILES "${cloader_generated_include_dir}/cloader/version.h"
+install(
+    FILES "${cloader_generated_include_dir}/cloader/version.h"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/cloader"
 )
-install(TARGETS cloader
+install(
+    TARGETS cloader
     EXPORT cloader-targets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

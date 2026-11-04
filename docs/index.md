@@ -1,4 +1,4 @@
-# Cloader
+# Cloader 
 
 > Tiny cross-platform C++ class loader library.
 
@@ -47,6 +47,12 @@ with the repository.
 cmake -S . -B build -DCLOADER_BUILD_EXAMPLES=ON
 cmake --build build
 ```
+
+## Logging
+
+Cloader logs diagnostics to stderr as `(cloader) [LEVEL] message`. Logging is
+disabled by default; set the `CLOADER_LOG` environment variable to enable it.
+The accepted values are documented on @ref cloader::details::logging::LogLevel.
 
 ## API overview
 

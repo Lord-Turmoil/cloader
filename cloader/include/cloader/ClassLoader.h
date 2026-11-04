@@ -19,9 +19,8 @@ namespace cloader
 {
 
 /**
- * @brief Base implementation of the ClassLoader class.
- * @note This is essentially a utility class that wraps all the low-level operations of loading a class from a dynamic
- * library.
+ * @brief Common base of all class loaders.
+ * @note This base wraps the low-level operations of loading a class from a dynamic library.
  */
 class ClassLoaderBase
 {
@@ -80,12 +79,10 @@ protected:
 
 /**
  * @brief Strongly-typed class loader.
- * @details On constructed and loaded, it will be responsible for instantiating the
- * class from the dynamic library.
+ * @details It loads the dynamic library on construction and instantiates classes from it.
  * @tparam T The type of the class to load. This must be a subclass of Loadable.
  * @tparam D The deleter type for the class.
- * @warning The ClassLoader also represents the lifetime of the loaded dynamic libary, therefore it must live longer
- * than any instances of the class loaded from the library.
+ * @warning A ClassLoader owns the loaded dynamic library, so it must outlive every instance created from it.
  */
 template <typename T, typename D = Loadable::Deleter<T>>
 requires(std::is_base_of_v<Loadable, T>)
@@ -95,11 +92,10 @@ public:
     using InstancePtr = std::unique_ptr<T, D>;
 
     /**
-     * @brief Loading the class from the given dynamic library.
-     * @details This constructor will load the class from the given dynamic library, but not yet validates whether the
-     * class is of the correct type. The validation will be done when NewInstance is called.
-     * @param filepath The path to the dynamic library file. It can be found as long as the library is in the system
-     * library search path.
+     * @brief Loads the class from the given dynamic library.
+     * @details Loads the class from the given dynamic library. Whether the class actually matches T is only checked
+     * when NewInstance is called.
+     * @param filepath The path to the dynamic library file. The file is looked up in the system library search path.
      * @param className The name of the class to load from the dynamic library.
      * @throws InvalidArgumentException If the filepath or className is null or empty.
      * @throws FileNotFoundException If the dynamic library file is not found.
@@ -110,8 +106,8 @@ public:
 
     /**
      * @brief Construct a new ClassLoader given the specified new instance and delete instance functions.
-     * @details This constructor is mainly used to make ClassLoader compatible with internal classes that are not loaded
-     * from a dynamic library, in which case we have direct access to the new instance and delete instance functions.
+     * @details This constructor is mainly used to wrap factory functions of classes that are not loaded from a
+     * dynamic library.
      * @param newInstanceFn The function pointer to the new instance function.
      * @param deleteInstanceFn The function pointer to the delete instance function.
      * @throws InvalidArgumentException If the newInstanceFn is null.
@@ -134,16 +130,14 @@ public:
 
     /**
      * @brief Create a new instance of the class.
-     * @details This method will call the new instance function to create a new instance of the class. It will also
-     * validate whether the instance is of the correct type. All exceptions thrown during the instantiation will be
-     * wrapped into an InstantiationException, which can be retrieved using \ref InstantiationException::Cause.
+     * @details Calls the new instance function and checks that the result is of type T. Any exception thrown during
+     * instantiation is wrapped in an InstantiationException; see \ref InstantiationException::Cause.
      * @param args The arguments to pass to the new instance function.
      * @return A unique pointer to the new instance.
      * @throws InstantiationException If the new instance cannot be created.
      * @see cloader::Loadable
-     * @note The arguments should follow the definition of the new instance function, and is the library user's
-     * responsibility to ensure the arguments are correct. The library will not validate the arguments, but exceptions
-     * may be thrown due to invalid arguments.
+     * @note The arguments are forwarded to the new instance function as-is. Making sure they are correct is the
+     * caller's responsibility; the library does not validate them, though invalid arguments may lead to exceptions.
      */
     InstancePtr NewInstance(void* args);
 };

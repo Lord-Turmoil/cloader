@@ -12,28 +12,31 @@ namespace cloader::details
 
 /**
  * @brief Logging utilities for the Cloader library.
- * @details The logging level is controlled by the environment variable.
+ * @details The logging level is read from the CLOADER_LOG environment variable on first use.
  */
 namespace logging
 {
 
 /**
  * @brief Logging levels for the Cloader library.
+ * @details The level is read from the CLOADER_LOG environment variable (see \ref CLOADER_LOG_LEVEL_ENV_VAR). Each
+ * enumerator below lists the values that select it. The values are case-insensitive; any other value, or an unset
+ * variable, disables logging (selects \ref LogLevel::Disabled).
  */
 enum class LogLevel
 {
-    Unknown,
-    Debug,
-    Info,
-    Warning,
-    Error,
-    Disabled,
+    Unknown,  ///< Placeholder for the unparsed state; never returned by CurrentLogLevel().
+    Debug,    ///< Selected by "debug", "d", "verbose" or "v".
+    Info,     ///< Selected by "info" or "i".
+    Warning,  ///< Selected by "warning", "warn" or "w".
+    Error,    ///< Selected by "error" or "e".
+    Disabled, ///< Logging is turned off (the default).
 };
 
 /**
  * @brief Get the current logging level.
- * @details The logging level is retrieved from the environment variable named \ref CLOADER_LOG_LEVEL_ENV_VAR on the
- * first call to this function. Subsequent calls will return the cached value.
+ * @details The logging level is read from the CLOADER_LOG environment variable (see \ref CLOADER_LOG_LEVEL_ENV_VAR)
+ * on the first call to this function, and cached afterwards. See \ref LogLevel for the accepted values.
  * @return The current logging level.
  */
 LogLevel CurrentLogLevel();

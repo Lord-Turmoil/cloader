@@ -28,7 +28,7 @@ function(cloader_configure_compiler target)
 
     target_compile_features("${target}" PUBLIC cxx_std_20)
 
-    if(${CLOADER_IS_TOP_LEVEL})
+    if(PROJECT_IS_TOP_LEVEL)
         cloader_enable_warnings("${target}")
     endif()
 endfunction()

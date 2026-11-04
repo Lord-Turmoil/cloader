@@ -13,7 +13,7 @@ macro(configure_library target_name)
     install(
         TARGETS ${target_name}
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )    
+    )
 endmacro()
 
 configure_library(StandardLogger)
