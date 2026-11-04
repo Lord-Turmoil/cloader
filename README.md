@@ -59,8 +59,10 @@ cmake --build build
 ctest --test-dir build
 ```
 
-The `cmake --preset debug` and `cmake --preset release` presets configure
-builds with examples and tests enabled.
+Unit tests live in `tests/` and use [doctest](https://github.com/doctest/doctest),
+which CMake fetches automatically on configure. The `cmake --preset debug` and
+`cmake --preset release` presets configure builds with examples and tests
+enabled.
 
 ## Documentation
 

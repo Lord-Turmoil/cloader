@@ -42,6 +42,10 @@ endif()
 
 add_subdirectory(cloader)
 
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
 if(CLOADER_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()

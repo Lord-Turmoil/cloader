@@ -41,6 +41,9 @@ set_target_properties(
         EXPORT_NAME cloader
         VERSION "${PROJECT_VERSION}"
         SOVERSION "${PROJECT_VERSION_MAJOR}"
+        # Plugin libraries are shared libraries, so the static library must be
+        # compiled as position independent code to be linkable into them.
+        POSITION_INDEPENDENT_CODE ON
 )
 
 install(
