@@ -15,7 +15,7 @@
 #error "Unsupported platform"
 #endif
 
-#if defined(CLOADER_PLATFORM_LINUX) || defined(COLOADER_PLATFORM_APPLE)
+#if defined(CLOADER_PLATFORM_LINUX) || defined(CLOADER_PLATFORM_APPLE)
 #define CLOADER_PLATFORM_UNIX
 #endif
 

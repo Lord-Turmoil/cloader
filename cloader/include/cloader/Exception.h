@@ -54,8 +54,8 @@ public:
 
 /**
  * @brief Exception thrown when the specified dynamic library file is not found.
- * @details By default Cloader looks for the library file in all system library paths. If the library file is not found,
- * perhaps you forget to add certain paths to the system library search path.
+ * @details The library file is looked up in the system library search paths. If the file is not found, make sure its
+ * directory is on the system library search path.
  */
 class FileNotFoundException : public CloaderException
 {
@@ -90,8 +90,8 @@ public:
 
 /**
  * @brief Exception thrown when an instance of a class cannot be created.
- * @details This exception is thrown for various reasons. Usually it is caused by inner exceptions thrown during the
- * instantiation of the class. The cause of the exception can be retrieved using the \ref Cause() method.
+ * @details Usually raised by the factory function during instantiation. The underlying exception can be retrieved with
+ * \ref Cause().
  */
 class InstantiationException : public CloaderException
 {
