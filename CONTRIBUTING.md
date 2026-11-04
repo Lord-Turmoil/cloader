@@ -21,19 +21,20 @@ ctest --preset default
 
 ## Making changes
 
-- `cloader/` holds the library itself, `examples/` the example projects and
-  `docs/` the Doxygen configuration and pages.
-- Source lists in `cloader/CMakeLists.txt` are explicit. If you add a new
-  source file, add it to the list in the same commit - the build will not pick
-  it up otherwise.
+- `cloader/` holds the library itself, `examples/` the example projects,
+  `docs/` the Doxygen configuration and pages, and `tests/` the unit tests.
+- Library sources are picked up by a file glob, so a new source file only
+  needs a re-run of CMake to be built. Add unit tests for new behavior under
+  `tests/`; they use [doctest](https://github.com/doctest/doctest), which CMake
+  fetches automatically on configure.
 - Run the formatter before committing:
 
   ```sh
   ./scripts/format.sh
   ```
 
-  This formats `cloader/` and `examples/` with clang-format using the
-  configuration in `.clang-format`.
+  This formats `cloader/`, `examples/` and `tests/` with clang-format using
+  the configuration in `.clang-format`.
 
 - If you changed public headers, rebuild the documentation and make sure
   Doxygen reports no warnings:
