@@ -1,3 +1,8 @@
+/**
+ * @file Logging.h
+ * @brief Logging utilities for the Cloader library.
+ */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,8 @@
+/**
+ * @file ClassLoader.h
+ * @brief Class loader for the Cloader library.
+ */
+
 #pragma once
 
 #include "cloader/Loadable.h"
@@ -75,7 +80,7 @@ protected:
 
 /**
  * @brief Strongly-typed class loader.
- * @details This is the main class of cloader. On constructed and loaded, it will be responsible for instantiating the
+ * @details On constructed and loaded, it will be responsible for instantiating the
  * class from the dynamic library.
  * @tparam T The type of the class to load. This must be a subclass of Loadable.
  * @tparam D The deleter type for the class.

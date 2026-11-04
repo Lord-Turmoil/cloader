@@ -1,3 +1,8 @@
+/**
+ * @file Config.h
+ * @brief Configuration macros for the Cloader library.
+ */
+
 #pragma once
 
 #if defined(_WIN32) || defined(_WIN64)

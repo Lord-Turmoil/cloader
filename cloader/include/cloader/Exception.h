@@ -1,3 +1,8 @@
+/**
+ * @file Exception.h
+ * @brief Exception classes for the Cloader library.
+ */
+
 #pragma once
 
 #include <stdexcept>
@@ -49,7 +54,7 @@ public:
 
 /**
  * @brief Exception thrown when the specified dynamic library file is not found.
- * @details By default cloader looks for the library file in all system library paths. If the library file is not found,
+ * @details By default Cloader looks for the library file in all system library paths. If the library file is not found,
  * perhaps you forget to add certain paths to the system library search path.
  */
 class FileNotFoundException : public CloaderException
