@@ -1,3 +1,8 @@
+/**
+ * @file Loadable.h
+ * @brief Base class for all classes that is intended to be loaded by Cloader.
+ */
+
 #pragma once
 
 #include <format>
@@ -6,8 +11,8 @@ namespace cloader
 {
 
 /**
- * @brief Base class for all classes that is intended to be loaded by cloader.
- * @details All classes that are intended to be loaded by cloader must inherit from this class. At the same time, each
+ * @brief Base class for all classes that is intended to be loaded by Cloader.
+ * @details All classes that are intended to be loaded by Cloader must inherit from this class. At the same time, each
  * class must provide a new instance function and an optional delete instance function in C style.
  *
  * The new instance function must have the following signature:
@@ -27,8 +32,11 @@ namespace cloader
  * of the class. If the delete instance function is not provided, the default delete operator will be used to delete the
  * instance.
  *
- * @see CLOADER_NEW_SYMBOL_PREFIX
- * @see CLOADER_DELETE_SYMBOL_PREFIX
+ * However, you can also use the provided macros to declare the new instance and delete instance functions. See \ref
+ * DECLARE_CLOADER_NEW_INSTANCE and \ref DECLARE_CLOADER_DELETE_INSTANCE for more details.
+ *
+ * @see DECLARE_CLOADER_NEW_INSTANCE
+ * @see DECLARE_CLOADER_DELETE_INSTANCE
  */
 class Loadable
 {
@@ -105,8 +113,26 @@ public:
 #define _CLOADER_NEW_INSTANCE_SYMBOL_NAME(...)    _CLOADER_GET_SYMBOL_NAME(Cloader_NewLoadableInstance, __VA_ARGS__)
 #define _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(...) _CLOADER_GET_SYMBOL_NAME(Cloader_DeleteLoadableInstance, __VA_ARGS__)
 
+/**
+ * @brief Declare a new instance function for a Loadable class.
+ * @details This macro saves you from writing the verbose C style function signature for the new instance function. All
+ * you need to do is to provide the fully qualified class name and namespaces. For example, for a class named "MyClass"
+ * in the namespace "my::namespace", you can declare the new instance function as follows:
+ * @code{.cpp}
+ * DECLARE_CLOADER_NEW_INSTANCE(my, namespace, MyClass);
+ * @endcode
+ */
 #define DECLARE_CLOADER_NEW_INSTANCE(...)                                                                              \
     extern "C" cloader::Loadable* _CLOADER_NEW_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(void* args)
 
+/**
+ * @brief Declare a delete instance function for a Loadable class.
+ * @details This macro saves you from writing the verbose C style function signature for the delete instance function.
+ * All you need to do is to provide the fully qualified class name and namespaces. For example, for a class named
+ * "MyClass" in the namespace "my::namespace", you can declare the delete instance function as follows:
+ * @code{.cpp}
+ * DECLARE_CLOADER_DELETE_INSTANCE(my, namespace, MyClass);
+ * @endcode
+ */
 #define DECLARE_CLOADER_DELETE_INSTANCE(...)                                                                           \
     extern "C" void _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(cloader::Loadable * instance)
