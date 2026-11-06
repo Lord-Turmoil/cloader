@@ -77,6 +77,21 @@ Open `build/docs/html/index.html` in a browser. Doxygen is required; Graphviz
 (`dot`) is optional and enables class and call graphs. The same can be done
 with `cmake --preset docs` followed by `cmake --build --preset docs`.
 
+## Coverage
+
+Build with coverage instrumentation and generate an HTML report:
+
+```sh
+cmake -S . -B build -DCLOADER_BUILD_COVERAGE=ON
+cmake --build build
+cmake --build build --target coverage
+```
+
+Open `build/coverage/index.html` in a browser. The target runs the unit tests
+and turns the collected data into a report with
+[gcovr](https://gcovr.com/), which needs to be installed (`pip install gcovr`
+works). Coverage is supported with GCC and Clang, not MSVC.
+
 ## Using Cloader in your project
 
 Install Cloader and link against it from CMake:

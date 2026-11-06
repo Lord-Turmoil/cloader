@@ -44,6 +44,9 @@ ctest --preset default
   cmake --build --preset docs
   ```
 
+- To check test coverage, configure with `-DCLOADER_BUILD_COVERAGE=ON` and
+  build the `coverage` target; the HTML report lands in `build/coverage`.
+
 ## Committing
 
 - Keep commits small and focused; one logical change per commit.

@@ -29,6 +29,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 option(CLOADER_BUILD_EXAMPLES "Build the example projects" OFF)
 option(CLOADER_BUILD_DOCS "Build the API documentation with Doxygen" OFF)
+option(CLOADER_BUILD_COVERAGE "Build with code coverage instrumentation" OFF)
 
 # Keep local builds self-contained: "cmake --install" drops everything into
 # install/ next to the sources instead of /usr/local.
@@ -45,6 +46,8 @@ add_subdirectory(cloader)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+
+cloader_configure_coverage()
 
 if(CLOADER_BUILD_EXAMPLES)
     add_subdirectory(examples)

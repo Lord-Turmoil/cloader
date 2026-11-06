@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
 
 namespace
 {
@@ -70,6 +71,11 @@ cloader::Loadable* ThrowStdException(void*)
 cloader::Loadable* ThrowInt(void*)
 {
     throw 42;
+}
+
+cloader::Loadable* ThrowInstantiationException(void*)
+{
+    throw cloader::InstantiationException(typeid(LocalPlugin), "nested factory");
 }
 
 } // namespace
@@ -201,4 +207,28 @@ TEST_CASE("NewInstance throws ClassCastException when the instance does not deri
     cloader::ClassLoader<OtherLoadable> loader(MakeLocal);
     CHECK_THROWS_AS(loader.NewInstance(nullptr), cloader::ClassCastException);
     CHECK(LocalPlugin::sLiveInstances == liveBefore);
+}
+
+TEST_CASE("NewInstance wraps InstantiationException thrown by the factory")
+{
+    cloader::ClassLoader<LocalPlugin> loader(ThrowInstantiationException);
+    try
+    {
+        loader.NewInstance(nullptr);
+        FAIL("expected InstantiationException");
+    }
+    catch (const cloader::InstantiationException& e)
+    {
+        CHECK(e.GetMessage().find("nested factory") != std::string::npos);
+        REQUIRE(e.Cause() != nullptr);
+        // The cause is stored by value as the CloaderException base (sliced),
+        // so rethrowing it yields CloaderException, not InstantiationException.
+        CHECK_THROWS_AS(std::rethrow_exception(e.Cause()), cloader::CloaderException);
+    }
+}
+
+TEST_CASE("Deleter deletes Loadable types without a delete function")
+{
+    cloader::Loadable::Deleter<OtherLoadable> deleter{ nullptr };
+    deleter(new OtherLoadable);
 }

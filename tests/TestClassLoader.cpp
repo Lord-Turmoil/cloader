@@ -20,6 +20,37 @@ std::string PluginPath()
     return std::string(CLOADER_TEST_PLUGIN_DIR) + "/" + CLOADER_TEST_PLUGIN_NAME;
 }
 
+// The plugin library exports failing factories for these classes, so the
+// successful paths are exercised here with local factories instead.
+cloader::Loadable* MakeNullPlugin(void*)
+{
+    return new cloader_test::NullPlugin;
+}
+
+cloader::Loadable* MakeThrowingPlugin(void*)
+{
+    return new cloader_test::ThrowingPlugin;
+}
+
+cloader::Loadable* MakeThrowingCloaderPlugin(void*)
+{
+    return new cloader_test::ThrowingCloaderPlugin;
+}
+
+int sDirectDeleteCalls = 0;
+
+void CountDirectDelete(cloader::Loadable* instance)
+{
+    ++sDirectDeleteCalls;
+    delete instance;
+}
+
+void ThrowingDirectDelete(cloader::Loadable* instance)
+{
+    delete instance;
+    throw std::runtime_error("direct delete failed");
+}
+
 } // namespace
 
 TEST_CASE("loads a class from a shared library and forwards args")
@@ -161,4 +192,44 @@ TEST_CASE("class cast failures delete the instance through its delete function")
     CHECK_THROWS_AS(loader.NewInstance(nullptr), cloader::ClassCastException);
     CHECK(cloader_test::TestPlugin::DeleteCalls() == deletesBefore + 1);
     CHECK(cloader_test::TestPlugin::LiveInstances() == liveBefore);
+}
+
+TEST_CASE("Deleter falls back to delete for plugin classes that never instantiate")
+{
+    // NullPlugin, ThrowingPlugin and ThrowingCloaderPlugin never produce an
+    // instance through NewInstance (null return or factory throw), so their
+    // deleters are exercised directly to check the fallback for every type.
+    cloader::Loadable::Deleter<cloader_test::NullPlugin>{ nullptr }(new cloader_test::NullPlugin);
+    cloader::Loadable::Deleter<cloader_test::ThrowingPlugin>{ nullptr }(new cloader_test::ThrowingPlugin);
+    cloader::Loadable::Deleter<cloader_test::ThrowingCloaderPlugin>{ nullptr }(new cloader_test::ThrowingCloaderPlugin);
+}
+
+TEST_CASE("NewInstance succeeds for every plugin type given a working factory")
+{
+    cloader::ClassLoader<cloader_test::NullPlugin> nullLoader(MakeNullPlugin);
+    cloader::ClassLoader<cloader_test::ThrowingPlugin> throwingLoader(MakeThrowingPlugin);
+    cloader::ClassLoader<cloader_test::ThrowingCloaderPlugin> cloaderThrowingLoader(MakeThrowingCloaderPlugin);
+
+    REQUIRE(nullLoader.NewInstance(nullptr) != nullptr);
+    REQUIRE(throwingLoader.NewInstance(nullptr) != nullptr);
+    REQUIRE(cloaderThrowingLoader.NewInstance(nullptr) != nullptr);
+}
+
+TEST_CASE_TEMPLATE("Deleter covers every configuration for plugin types", T, cloader_test::NullPlugin,
+                   cloader_test::ThrowingPlugin, cloader_test::ThrowingCloaderPlugin)
+{
+    // Default delete, valid and null pointer.
+    cloader::Loadable::Deleter<T>{ nullptr }(new T);
+    cloader::Loadable::Deleter<T>{ nullptr }(nullptr);
+
+    // Custom delete function: called for valid pointers, skipped for null.
+    sDirectDeleteCalls = 0;
+    cloader::Loadable::Deleter<T>{ CountDirectDelete }(new T);
+    CHECK(sDirectDeleteCalls == 1);
+    cloader::Loadable::Deleter<T>{ CountDirectDelete }(nullptr);
+    CHECK(sDirectDeleteCalls == 1);
+
+    // Exceptions from the delete function are suppressed. The instance is
+    // deleted before throwing so it does not leak.
+    cloader::Loadable::Deleter<T>{ ThrowingDirectDelete }(new T);
 }
