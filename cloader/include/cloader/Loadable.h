@@ -82,6 +82,9 @@ public:
 
 } // namespace cloader
 
+// Sadly MSVC's macro expansion could not automatically expand __VA_ARGS__...
+#define _CLOADER_EXPAND_MACRO(X) X
+
 #define _CLOADER_SELECT_SYMBOL_NAME_MACRO(_1, _2, _3, _4, _5, NAME, ...) NAME
 
 // clang-format off
@@ -98,7 +101,7 @@ public:
 #define _CLOADER_GET_SYMBOL_NAME_5(PREFIX, N1, N2, N3, N4, CLASS_NAME)                                                 \
     PREFIX##_##N1##_##N2##_##N3##_##N4##__##CLASS_NAME
 
-#define _CLOADER_GET_SYMBOL_NAME(PREFIX, ...)                                                                          \
+#define _CLOADER_GET_SYMBOL_NAME(PREFIX, ...) _CLOADER_EXPAND_MACRO(                                                   \
     _CLOADER_SELECT_SYMBOL_NAME_MACRO(                                                                                 \
         __VA_ARGS__,                                                                                                   \
         _CLOADER_GET_SYMBOL_NAME_5,                                                                                    \
@@ -107,11 +110,16 @@ public:
         _CLOADER_GET_SYMBOL_NAME_2,                                                                                    \
         _CLOADER_GET_SYMBOL_NAME_1,                                                                                    \
         _CLOADER_GET_SYMBOL_NAME_0                                                                                     \
-    )(PREFIX, __VA_ARGS__)
-// clang-format on
+    )(PREFIX, __VA_ARGS__)                                                                                             \
+)
 
-#define _CLOADER_NEW_INSTANCE_SYMBOL_NAME(...)    _CLOADER_GET_SYMBOL_NAME(Cloader_NewLoadableInstance, __VA_ARGS__)
-#define _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(...) _CLOADER_GET_SYMBOL_NAME(Cloader_DeleteLoadableInstance, __VA_ARGS__)
+#define _CLOADER_NEW_INSTANCE_SYMBOL_NAME(...) _CLOADER_EXPAND_MACRO(                                                  \
+    _CLOADER_GET_SYMBOL_NAME(Cloader_NewLoadableInstance, __VA_ARGS__)                                                 \
+)
+
+#define _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(...) _CLOADER_EXPAND_MACRO(                                               \
+    _CLOADER_GET_SYMBOL_NAME(Cloader_DeleteLoadableInstance, __VA_ARGS__)                                              \
+)
 
 /**
  * @brief Declares the C-style new instance function for a Loadable class.
@@ -121,8 +129,9 @@ public:
  * DECLARE_CLOADER_NEW_INSTANCE(my, namespace, MyClass);
  * @endcode
  */
-#define DECLARE_CLOADER_NEW_INSTANCE(...)                                                                              \
-    extern "C" cloader::Loadable* _CLOADER_NEW_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(void* args)
+#define DECLARE_CLOADER_NEW_INSTANCE(...) _CLOADER_EXPAND_MACRO(                                                       \
+    extern "C" cloader::Loadable* _CLOADER_NEW_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(void* args)                           \
+)
 
 /**
  * @brief Declares the C-style delete instance function for a Loadable class.
@@ -132,5 +141,8 @@ public:
  * DECLARE_CLOADER_DELETE_INSTANCE(my, namespace, MyClass);
  * @endcode
  */
-#define DECLARE_CLOADER_DELETE_INSTANCE(...)                                                                           \
-    extern "C" void _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(cloader::Loadable * instance)
+#define DECLARE_CLOADER_DELETE_INSTANCE(...) _CLOADER_EXPAND_MACRO(                                                   \
+        extern "C" void _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(cloader::Loadable * instance)               \
+)
+
+// clang-format on
