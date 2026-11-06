@@ -85,3 +85,17 @@ TEST_CASE("InstantiationException from an exception pointer keeps the plain mess
     REQUIRE(e.Cause() != nullptr);
     CHECK_THROWS_AS(std::rethrow_exception(e.Cause()), std::runtime_error);
 }
+
+TEST_CASE("InvalidArgumentException also accepts a std::string message")
+{
+    cloader::InvalidArgumentException e(std::string("std::string message"));
+    CHECK(e.GetMessage() == "std::string message");
+    CHECK(e.what() == std::string("std::string message"));
+}
+
+TEST_CASE("InstantiationException accepts a plain message")
+{
+    cloader::InstantiationException e("plain message");
+    CHECK(e.GetMessage() == "plain message");
+    CHECK(e.Cause() == nullptr);
+}

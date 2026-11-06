@@ -36,6 +36,17 @@
                 "CLOADER_BUILD_DOCS": "ON",
                 "CLOADER_DOCS_OUTPUT_DIRECTORY": "${sourceDir}/build/docs"
             }
+        },
+        {
+            "name": "coverage",
+            "displayName": "Coverage",
+            "description": "Debug build with code coverage instrumentation",
+            "inherits": "debug",
+            "binaryDir": "${sourceDir}/build/cov",
+            "cacheVariables": {
+                "CLOADER_BUILD_COVERAGE": "ON",
+                "CLOADER_COVERAGE_OUTPUT_DIR": "${sourceDir}/build/coverage"
+            }
         }
     ],
     "buildPresets": [
@@ -50,7 +61,16 @@
         {
             "name": "docs",
             "configurePreset": "docs",
-            "targets": ["docs"]
+            "targets": [
+                "docs"
+            ]
+        },
+        {
+            "name": "coverage",
+            "configurePreset": "coverage",
+            "targets": [
+                "coverage"
+            ]
         }
     ],
     "testPresets": [

@@ -5,6 +5,7 @@ BUILD_TYPE=${1:-Debug}
 cmake -S . -B build                 \
     -DCLOADER_BUILD_EXAMPLES=ON     \
     -DCLOADER_BUILD_DOCS=ON         \
+    -DCLOADER_BUILD_COVERAGE=ON     \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 echo "Building Cloader with build type: $BUILD_TYPE"
@@ -16,3 +17,4 @@ fi
 
 echo "Building docs"
 cmake --build build --target docs
+cmake --build build --target coverage

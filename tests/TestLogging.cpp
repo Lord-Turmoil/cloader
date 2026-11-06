@@ -47,6 +47,12 @@ TEST_CASE("log-level-disabled")
     CaptureStdErr capture;
     LogError("should not appear");
     CHECK(capture.Str().empty());
+
+    // Disabled is the top of the level scale, so logging "at" Disabled still
+    // passes the gate; its tag falls through to the UNKNOWN default.
+    Log(LogLevel::Unknown, "still hidden");
+    Log(LogLevel::Disabled, "boundary");
+    CHECK(capture.Str() == "(cloader) [UNKNOWN] boundary\n");
 }
 
 TEST_CASE("log-level-invalid")
@@ -85,4 +91,24 @@ TEST_CASE("log-level-error")
     LogWarning("filtered");
     LogError("err");
     CHECK(capture.Str() == "(cloader) [ERROR] err\n");
+}
+
+TEST_CASE("log-level-warning")
+{
+    CHECK(CurrentLogLevel() == LogLevel::Warning);
+    CaptureStdErr capture;
+    LogDebug("filtered");
+    LogInfo("filtered");
+    LogWarning("warn");
+    LogError("err");
+    CHECK(capture.Str() == "(cloader) [WARNING] warn\n"
+                           "(cloader) [ERROR] err\n");
+}
+
+TEST_CASE("log-level-unset")
+{
+    CHECK(CurrentLogLevel() == LogLevel::Disabled);
+    CaptureStdErr capture;
+    LogError("should not appear");
+    CHECK(capture.Str().empty());
 }
