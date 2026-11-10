@@ -18,18 +18,28 @@ project(
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-# Only build tests when this project is built on its own, not when it is
-# pulled in as a dependency.
-option(BUILD_TESTING "Build tests" ${PROJECT_IS_TOP_LEVEL})
-include(CTest)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
-option(CLOADER_BUILD_EXAMPLES "Build the example projects" OFF)
-option(CLOADER_BUILD_DOCS "Build the API documentation with Doxygen" OFF)
-option(CLOADER_BUILD_COVERAGE "Build with code coverage instrumentation" OFF)
+option(CLOADER_BUILD_EXAMPLES   "Build the example projects" OFF)
+option(CLOADER_BUILD_DOCS       "Build the API documentation with Doxygen" OFF)
+option(CLOADER_BUILD_TESTS      "Build the unit tests" OFF)
+option(CLOADER_BUILD_COVERAGE   "Build with code coverage instrumentation" OFF)
+
+#If building with coverage, also enable testing if it is not already enabled.
+if(CLOADER_BUILD_COVERAGE AND NOT CLOADER_BUILD_TESTS)
+    message(STATUS "CLOADER_BUILD_COVERAGE is ON, enabling CLOADER_BUILD_TESTS")
+    set(CLOADER_BUILD_TESTS ON CACHE BOOL "Build the unit tests" FORCE)
+endif()
+
+# ---------- Configuration Summary ----------
+message(STATUS "Cloader version ${CLOADER_VERSION}")
+message(STATUS "Cloader build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Cloader build examples: ${CLOADER_BUILD_EXAMPLES}")
+message(STATUS "Cloader build docs: ${CLOADER_BUILD_DOCS}")
+message(STATUS "Cloader build tests: ${CLOADER_BUILD_TESTS}")
+message(STATUS "Cloader build coverage: ${CLOADER_BUILD_COVERAGE}")
 
 # Keep local builds self-contained: "cmake --install" drops everything into
 # install/ next to the sources instead of /usr/local.
@@ -43,7 +53,7 @@ endif()
 
 add_subdirectory(cloader)
 
-if(BUILD_TESTING)
+if(CLOADER_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 

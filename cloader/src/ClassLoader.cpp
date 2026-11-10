@@ -52,7 +52,7 @@ namespace cloader
 
 ClassLoaderBase::ClassLoaderBase(const char* filepath, const char* className)
 {
-    HandleGuard handle(details::LoadLibrary(filepath));
+    HandleGuard handle(details::LoadLibraryFromFile(filepath));
 
     std::string newInstanceSymbolName = details::ResolveSymbolName(CLOADER_NEW_SYMBOL_PREFIX, className);
     std::string deleteInstanceSymbolName = details::ResolveSymbolName(CLOADER_DELETE_SYMBOL_PREFIX, className);

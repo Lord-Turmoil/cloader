@@ -14,9 +14,7 @@ implementations live in libraries that can be swapped without rebuilding.
 ## Features
 
 - Loads shared libraries from a file path at runtime
-- Instantiates classes through the `cloader::Loadable` interface
-- RAII cleanup of libraries and loaded instances
-- Typed exceptions for every failure mode
+- Simple API for loading and instantiating classes
 - Cross-platform: Linux, macOS and Windows
 
 ## Quick start

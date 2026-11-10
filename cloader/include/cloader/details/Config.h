@@ -19,6 +19,10 @@
 #define CLOADER_PLATFORM_UNIX
 #endif
 
+#ifdef CLOADER_PLATFORM_WINDOWS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #define CLOADER_EXPAND(X)    X
 #define CLOADER_STRINGIFY(X) #X
 

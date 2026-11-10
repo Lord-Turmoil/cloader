@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <typeinfo>
 
 namespace cloader
 {

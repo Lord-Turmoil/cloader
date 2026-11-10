@@ -6,6 +6,12 @@
 #include <cstdlib>
 #include <iostream>
 
+#ifdef CLOADER_PLATFORM_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#endif
+
 namespace
 {
 
@@ -17,7 +23,7 @@ cloader::details::logging::LogLevel ParseLogLevel(const char* value)
     }
 
     std::string level(value);
-    std::transform(level.begin(), level.end(), level.begin(), tolower);
+    std::transform(level.begin(), level.end(), level.begin(), [](char c) { return static_cast<char>(tolower(c)); });
 
     if (level == "debug" || level == "d" || level == "verbose" || level == "v")
     {
@@ -72,8 +78,21 @@ LogLevel CurrentLogLevel()
 {
     if (sLogLevel == LogLevel::Unknown)
     {
+#ifdef CLOADER_PLATFORM_WINDOWS
+        char* env;
+        if (_dupenv_s(&env, nullptr, CLOADER_LOG_LEVEL_ENV_VAR))
+        {
+            sLogLevel = LogLevel::Disabled;
+        }
+        else
+        {
+            sLogLevel = ParseLogLevel(env);
+            free(env);
+        }
+#else
         const char* env = getenv(CLOADER_LOG_LEVEL_ENV_VAR);
         sLogLevel = ParseLogLevel(env);
+#endif
     }
     return sLogLevel;
 }
