@@ -12,7 +12,7 @@ namespace cloader::details
  * @throws InvalidArgumentException If the filepath is null or empty.
  * @throws FileNotFoundException If the dynamic library file is not found.
  */
-void* LoadLibrary(const char* filepath);
+void* LoadLibraryFromFile(const char* filepath);
 
 /**
  * @brief Unload a dynamic library given its handle.

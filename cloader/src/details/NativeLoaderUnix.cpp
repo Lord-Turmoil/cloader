@@ -40,7 +40,7 @@ const std::string& GetFilepathForHandle(void* handle)
 namespace cloader::details
 {
 
-void* LoadLibrary(const char* filepath)
+void* LoadLibraryFromFile(const char* filepath)
 {
     if (!filepath || !*filepath)
     {
