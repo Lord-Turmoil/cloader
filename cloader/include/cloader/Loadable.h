@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "cloader/details/Config.h"
+#include "cloader/details/Logging.h"
+
 #include <format>
 
 namespace cloader
@@ -38,7 +41,7 @@ namespace cloader
  * @see DECLARE_CLOADER_NEW_INSTANCE
  * @see DECLARE_CLOADER_DELETE_INSTANCE
  */
-class Loadable
+class CLOADER_EXPORT Loadable
 {
 public:
     virtual ~Loadable() = default;
@@ -65,6 +68,11 @@ public:
                     try
                     {
                         deleter(loadable);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        details::logging::LogWarning(std::format("Exception thrown while deleting loadable instance of type {}: {}",
+                                               typeid(T).name(), e.what()));
                     }
                     catch (...)
                     {
@@ -130,7 +138,7 @@ public:
  * @endcode
  */
 #define DECLARE_CLOADER_NEW_INSTANCE(...) _CLOADER_EXPAND_MACRO(                                                       \
-    extern "C" cloader::Loadable* _CLOADER_NEW_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(void* args)                           \
+    extern "C" CLOADER_EXPORT cloader::Loadable* _CLOADER_NEW_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(void* args)            \
 )
 
 /**
@@ -142,7 +150,7 @@ public:
  * @endcode
  */
 #define DECLARE_CLOADER_DELETE_INSTANCE(...) _CLOADER_EXPAND_MACRO(                                                   \
-        extern "C" void _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(cloader::Loadable * instance)               \
+        extern "C" CLOADER_EXPORT void _CLOADER_DELETE_INSTANCE_SYMBOL_NAME(__VA_ARGS__)(cloader::Loadable * instance)\
 )
 
 // clang-format on

@@ -28,6 +28,11 @@ case "$(uname -s)" in
     Linux)
         export LD_LIBRARY_PATH="$EXTRA_LIBRARY_PATH${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
         ;;
+    MINGW*|MSYS*|CYGWIN*)
+        # Windows keeps the plugin DLLs next to the executable, so no library
+        # path is needed - just the .exe suffix.
+        APP_BIN="$APP_BIN.exe"
+        ;;
 esac
 
 $APP_BIN "$@"

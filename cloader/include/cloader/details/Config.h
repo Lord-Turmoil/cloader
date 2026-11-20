@@ -19,8 +19,16 @@
 #define CLOADER_PLATFORM_UNIX
 #endif
 
-#ifdef CLOADER_PLATFORM_WINDOWS
-#define _CRT_SECURE_NO_WARNINGS
+/**
+ * @brief Marks a symbol for export from a plugin library.
+ * @details Plugin factories must be visible to the host's runtime symbol lookup. On Windows nothing is exported from a
+ * DLL unless it is explicitly marked; on Unix-like systems the default visibility already exports everything, but the
+ * attribute is kept so plugins keep working under -fvisibility=hidden.
+ */
+#if defined(CLOADER_PLATFORM_WINDOWS)
+#define CLOADER_EXPORT __declspec(dllexport)
+#else
+#define CLOADER_EXPORT __attribute__((visibility("default")))
 #endif
 
 #define CLOADER_EXPAND(X)    X

@@ -13,7 +13,8 @@
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CLOADER_BUILD_EXAMPLES": "ON"
+                "CLOADER_BUILD_EXAMPLES": "ON",
+                "CLOADER_BUILD_TESTS": "ON"
             }
         },
         {
@@ -23,7 +24,8 @@
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CLOADER_BUILD_EXAMPLES": "ON"
+                "CLOADER_BUILD_EXAMPLES": "ON",
+                "CLOADER_BUILD_TESTS": "ON"
             }
         },
         {
@@ -52,15 +54,18 @@
     "buildPresets": [
         {
             "name": "debug",
-            "configurePreset": "debug"
+            "configurePreset": "debug",
+            "configuration": "Debug"
         },
         {
             "name": "release",
-            "configurePreset": "release"
+            "configurePreset": "release",
+            "configuration": "Release"
         },
         {
             "name": "docs",
             "configurePreset": "docs",
+            "configuration": "Release",
             "targets": [
                 "docs"
             ]
@@ -68,6 +73,7 @@
         {
             "name": "coverage",
             "configurePreset": "coverage",
+            "configuration": "Debug",
             "targets": [
                 "coverage"
             ]
@@ -77,6 +83,7 @@
         {
             "name": "default",
             "configurePreset": "debug",
+            "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
             }
