@@ -1,37 +1,27 @@
 # Cloader
 
-A tiny cross-platform C++ class loader library.
+> A tiny cross-platform C++ class loader library.
 
 [![CI](https://github.com/Lord-Turmoil/cloader/actions/workflows/ci.yml/badge.svg)](https://github.com/Lord-Turmoil/cloader/actions/workflows/ci.yml)
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Cloader loads shared libraries at runtime and instantiates C++ classes that
-implement a common interface. It is useful for plugin systems: the host
-application only knows an abstract interface, while the concrete
-implementations live in libraries that can be swapped without rebuilding.
-
-## Features
-
-- Loads shared libraries from a file path at runtime
-- Simple API for loading and instantiating classes
-- Cross-platform: Linux, macOS and Windows
+Cloader offers a simple API to load classes from shared libraries at runtime.
 
 ## Quick start
 
-The plugin defines a class that derives from `cloader::Loadable` and exports a
-C-style factory:
+Simply inherit from `cloader::Loadable` and implement a factory function to return a new instance of your class. You may use `args` to pass additional parameters to the factory function, which is provided on calling `NewInstance`.
 
 ```cpp
 #include <cloader/cloader.h>
 
-class MyClass : public cloader::Loadable
+class CLOADER_EXPORT MyClass : public cloader::Loadable
 {
 public:
     // ...
 };
 
-DECLARE_CLOADER_NEW_INSTANCE(MyClass)
+DECLARE_CLOADER_NEW_INSTANCE(MyClass) /* void* args */
 {
     return new MyClass();
 }
@@ -40,7 +30,7 @@ DECLARE_CLOADER_NEW_INSTANCE(MyClass)
 The host loads and instantiates it like this:
 
 ```cpp
-cloader::ClassLoader<MyClass> loader("./libMyClass.so", "MyClass");
+cloader::ClassLoader<MyClass> loader("./libMyClass.so", "MyClass"); // "MyClass.dll" on Windows
 cloader::LoadablePtr<MyClass> instance = loader.NewInstance(nullptr);
 ```
 
@@ -75,21 +65,6 @@ Open `build/docs/html/index.html` in a browser. Doxygen is required; Graphviz
 (`dot`) is optional and enables class and call graphs. The same can be done
 with `cmake --preset docs` followed by `cmake --build --preset docs`.
 
-## Coverage
-
-Build with coverage instrumentation and generate an HTML report:
-
-```sh
-cmake -S . -B build -DCLOADER_BUILD_COVERAGE=ON
-cmake --build build
-cmake --build build --target coverage
-```
-
-Open `build/coverage/index.html` in a browser. The target runs the unit tests
-and turns the collected data into a report with
-[gcovr](https://gcovr.com/), which needs to be installed (`pip install gcovr`
-works). Coverage is supported with GCC and Clang, not MSVC.
-
 ## Using Cloader in your project
 
 Install Cloader and link against it from CMake:
@@ -102,6 +77,8 @@ cmake --install build --prefix /path/to/prefix
 find_package(cloader CONFIG REQUIRED)
 target_link_libraries(your_target PRIVATE cloader::cloader)
 ```
+
+Or you can just include it as a submodule in your project.
 
 ## Contributing
 

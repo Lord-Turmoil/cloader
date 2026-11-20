@@ -28,8 +28,8 @@ TEST_CASE("ResolveSymbolName mangles namespace separators")
 
 TEST_CASE("LoadLibrary rejects null or empty paths")
 {
-    CHECK_THROWS_WITH(cloader::details::LoadLibrary(nullptr), "Path to the library cannot be null or empty");
-    CHECK_THROWS_WITH(cloader::details::LoadLibrary(""), "Path to the library cannot be null or empty");
+    CHECK_THROWS_WITH(cloader::details::LoadLibraryFromFile(nullptr), "Path to the library cannot be null or empty");
+    CHECK_THROWS_WITH(cloader::details::LoadLibraryFromFile(""), "Path to the library cannot be null or empty");
 }
 
 TEST_CASE("LoadSymbolFromLibrary rejects null handles and symbol names")

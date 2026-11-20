@@ -59,3 +59,18 @@ ctest --preset default
 Open a pull request against `main`. CI builds and tests the library on Linux,
 macOS and Windows, and builds the documentation - make sure it passes before
 asking for a review.
+
+## Coverage
+
+Build with coverage instrumentation and generate an HTML report:
+
+```sh
+cmake -S . -B build -DCLOADER_BUILD_COVERAGE=ON
+cmake --build build
+cmake --build build --target coverage
+```
+
+Open `build/coverage/index.html` in a browser. The target runs the unit tests
+and turns the collected data into a report with
+[gcovr](https://gcovr.com/), which needs to be installed (`pip install gcovr`
+works). Coverage is supported with GCC and Clang, not MSVC.

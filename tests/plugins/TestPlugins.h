@@ -13,7 +13,7 @@ namespace cloader_test
 {
 
 // Exports a delete function and reads a display name from args.
-class TestPlugin : public cloader::Loadable
+class CLOADER_EXPORT TestPlugin : public cloader::Loadable
 {
 public:
     explicit TestPlugin(std::string name);
@@ -29,7 +29,7 @@ private:
 };
 
 // Exports no delete function; hosts fall back to the default delete operator.
-class PlainPlugin : public cloader::Loadable
+class CLOADER_EXPORT PlainPlugin : public cloader::Loadable
 {
 public:
     PlainPlugin();

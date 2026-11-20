@@ -12,8 +12,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(doctest)
 
-# A shared library exporting the plugin classes the loader tests load at
-# runtime, mirroring how a real host application uses the library.
 add_library(
     cloader_test_plugins
     SHARED
@@ -48,16 +46,13 @@ target_link_libraries(
 cloader_configure_compiler(cloader-tests)
 
 # Tell the tests where the plugin library is and what it is called on this
-# platform. On Windows shared libraries land in the runtime directory.
-if(WIN32)
-    set(cloader_test_plugin_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-else()
-    set(cloader_test_plugin_dir "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-endif()
+# platform. Asking CMake for the plugin's output directory keeps this correct
+# for multi-config generators as well (Visual Studio places artifacts in
+# bin/<Config>, while single-config generators place them directly in bin).
 target_compile_definitions(
     cloader-tests
     PRIVATE
-        CLOADER_TEST_PLUGIN_DIR="${cloader_test_plugin_dir}"
+        CLOADER_TEST_PLUGIN_DIR="$<TARGET_FILE_DIR:cloader_test_plugins>"
         CLOADER_TEST_PLUGIN_NAME="${CMAKE_SHARED_LIBRARY_PREFIX}cloader_test_plugins${CMAKE_SHARED_LIBRARY_SUFFIX}"
 )
 
