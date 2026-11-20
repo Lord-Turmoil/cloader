@@ -4,6 +4,9 @@
 # extra dependency beyond a network connection on the first configure.
 include(FetchContent)
 
+# doctest is a test-only dependency: keep it out of cloader's install tree.
+set(DOCTEST_NO_INSTALL ON)
+
 FetchContent_Declare(
     doctest
     GIT_REPOSITORY https://github.com/doctest/doctest
@@ -18,6 +21,7 @@ add_library(
         plugins/TestPlugins.cpp
         plugins/TestPlugins.h
 )
+# The test plugins throw cloader's exceptions, so they need the library, not just cloader::headers.
 target_link_libraries(cloader_test_plugins PRIVATE cloader::cloader)
 cloader_configure_compiler(cloader_test_plugins)
 
@@ -53,7 +57,7 @@ target_compile_definitions(
     cloader-tests
     PRIVATE
         CLOADER_TEST_PLUGIN_DIR="$<TARGET_FILE_DIR:cloader_test_plugins>"
-        CLOADER_TEST_PLUGIN_NAME="${CMAKE_SHARED_LIBRARY_PREFIX}cloader_test_plugins${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        CLOADER_TEST_PLUGIN_NAME="$<TARGET_FILE_NAME:cloader_test_plugins>"
 )
 
 # The logging level is read from the environment once per process and cached,

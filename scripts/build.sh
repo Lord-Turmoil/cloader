@@ -103,6 +103,7 @@ cmake -S . -B "$BUILD_DIR"                              \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE"                    \
     -DCLOADER_BUILD_DOCS="$BUILD_DOCS"                  \
     -DCLOADER_BUILD_EXAMPLES="$BUILD_EXAMPLES"          \
+    -DCLOADER_BUILD_TESTS="$BUILD_TESTS"                \
     -DCLOADER_BUILD_COVERAGE="$BUILD_COVERAGE"
 if [ $? -ne 0 ]; then
     echo "CMake configuration failed"

@@ -78,7 +78,7 @@ cmake --build build
 Then run it, loading the `VerboseLogger` plugin from the shared library:
 
 ```sh
-./scripts/example.sh logger libVerboseLogger.so VerboseLogger "my logger"
+./scripts/example.sh logger libVerboseLogger.so ext::VerboseLogger "my logger"
 ```
 
 Or run the built-in `DummyLogger` without a plugin:

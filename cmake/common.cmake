@@ -46,8 +46,8 @@ endfunction()
 #
 # The "coverage" target runs the unit tests under GCC/Clang coverage
 # instrumentation and turns the collected data into an HTML report. The report
-# is written to ${CMAKE_BINARY_DIR}/coverage (override with
-# CLOUDER_COVERAGE_OUTPUT_DIR).
+# is written to ${PROJECT_BINARY_DIR}/coverage (override with
+# CLOADER_COVERAGE_OUTPUT_DIR).
 #
 # Requires gcovr (https://gcovr.com/), available as a system package or via
 # "pip install gcovr".
@@ -60,8 +60,8 @@ function(cloader_configure_coverage)
         message(FATAL_ERROR "CLOADER_BUILD_COVERAGE is not supported with MSVC; use GCC or Clang")
     endif()
 
-    if(NOT BUILD_TESTING)
-        message(WARNING "CLOADER_BUILD_COVERAGE is ON but BUILD_TESTING is OFF; the report will be empty")
+    if(NOT CLOADER_BUILD_TESTS)
+        message(WARNING "CLOADER_BUILD_COVERAGE is ON but CLOADER_BUILD_TESTS is OFF; the report will be empty")
     endif()
 
     find_program(CLOADER_COVERAGE_GCOVR_EXECUTABLE gcovr)
@@ -72,7 +72,7 @@ function(cloader_configure_coverage)
 
     set(
         CLOADER_COVERAGE_OUTPUT_DIR
-        "${CMAKE_BINARY_DIR}/coverage"
+        "${PROJECT_BINARY_DIR}/coverage"
         CACHE PATH "Directory the coverage report is written to"
     )
 
@@ -85,16 +85,16 @@ function(cloader_configure_coverage)
     add_custom_target(
         coverage
         # Drop stale coverage data so the report only reflects this run.
-        COMMAND find "${CMAKE_BINARY_DIR}" -name "*.gcda" -delete
+        COMMAND find "${PROJECT_BINARY_DIR}" -name "*.gcda" -delete
         COMMAND
             "${CMAKE_CTEST_COMMAND}"
-            --test-dir "${CMAKE_BINARY_DIR}"
+            --test-dir "${PROJECT_BINARY_DIR}"
             --output-on-failure
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${CLOADER_COVERAGE_OUTPUT_DIR}"
         COMMAND
             "${CLOADER_COVERAGE_GCOVR_EXECUTABLE}"
             --root "${PROJECT_SOURCE_DIR}"
-            --object-directory "${CMAKE_BINARY_DIR}"
+            --object-directory "${PROJECT_BINARY_DIR}"
             --filter "${cloader_coverage_filter}"
             # Throw branches are the exception-propagation edges of calls
             # (allocation failures and the like); they cannot be covered by
