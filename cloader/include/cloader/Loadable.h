@@ -71,8 +71,9 @@ public:
                     }
                     catch (const std::exception& e)
                     {
-                        details::logging::LogWarning(std::format("Exception thrown while deleting loadable instance of type {}: {}",
-                                               typeid(T).name(), e.what()));
+                        details::logging::LogWarning(
+                            std::format("Exception thrown while deleting loadable instance of type {}: {}",
+                                        typeid(T).name(), e.what()));
                     }
                     catch (...)
                     {

@@ -149,8 +149,7 @@ TEST_CASE("ClassLoader with a default delete function deletes through delete")
 
 TEST_CASE("ClassLoader factory constructors reject a null function")
 {
-    using NewInstanceFn = cloader::ClassLoaderBase::NewInstanceFn;
-    CHECK_THROWS_AS((cloader::ClassLoader<LocalPlugin>(static_cast<NewInstanceFn>(nullptr))),
+    CHECK_THROWS_AS((cloader::ClassLoader<LocalPlugin>(static_cast<cloader::NewInstanceFn>(nullptr))),
                     cloader::InvalidArgumentException);
     CHECK_THROWS_AS((cloader::ClassLoader<LocalPlugin>(nullptr, DeleteLocal)), cloader::InvalidArgumentException);
 }

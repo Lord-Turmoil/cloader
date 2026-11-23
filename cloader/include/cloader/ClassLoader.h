@@ -18,6 +18,9 @@
 namespace cloader
 {
 
+using NewInstanceFn = cloader::Loadable* (*)(void*);
+using DeleteInstanceFn = void (*)(cloader::Loadable*);
+
 /**
  * @brief Common base of all class loaders.
  * @note This base wraps the low-level operations of loading a class from a dynamic library.
@@ -25,9 +28,6 @@ namespace cloader
 class ClassLoaderBase
 {
 public:
-    using NewInstanceFn = cloader::Loadable* (*)(void*);
-    using DeleteInstanceFn = void (*)(cloader::Loadable*);
-
     /**
      * @brief Construct a new ClassLoaderBase object.
      * @param filepath The path to the dynamic library file.
