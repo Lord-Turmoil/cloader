@@ -104,11 +104,11 @@ public:
 #define _CLOADER_GET_SYMBOL_NAME_2(PREFIX, N1, CLASS_NAME)                                                             \
     PREFIX##_##N1##__##CLASS_NAME
 #define _CLOADER_GET_SYMBOL_NAME_3(PREFIX, N1, N2, CLASS_NAME)                                                         \
-    PREFIX##_##N1##_##N2##__##CLASS_NAME
+    PREFIX##_##N1##__##N2##__##CLASS_NAME
 #define _CLOADER_GET_SYMBOL_NAME_4(PREFIX, N1, N2, N3, CLASS_NAME)                                                     \
-    PREFIX##_##N1##_##N2##_##N3##__##CLASS_NAME
+    PREFIX##_##N1##__##N2##__##N3##__##CLASS_NAME
 #define _CLOADER_GET_SYMBOL_NAME_5(PREFIX, N1, N2, N3, N4, CLASS_NAME)                                                 \
-    PREFIX##_##N1##_##N2##_##N3##_##N4##__##CLASS_NAME
+    PREFIX##_##N1##__##N2##__##N3##__##N4##__##CLASS_NAME
 
 #define _CLOADER_GET_SYMBOL_NAME(PREFIX, ...) _CLOADER_EXPAND_MACRO(                                                   \
     _CLOADER_SELECT_SYMBOL_NAME_MACRO(                                                                                 \
